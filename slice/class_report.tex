@@ -7,6 +7,8 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 
+\graphicspath{{../fig/}}
+
 \title[Iterative Hessian Sketch]{Iterative Hessian Sketch for Constrained Least-Squares} 
 
 \author{Lydia Hsu, Shuaiwen Wang} 
@@ -154,6 +156,69 @@
 
 \begin{frame}
     \frametitle{Simulations in the paper}
+    \begin{figure}
+        \begin{center}
+            \begin{tabular}{ll}
+                \includegraphics[scale=0.22]{ihs_paper_mse_vs_n_ihs_naive_compare.png}
+                &
+                \includegraphics[scale=0.20]{ihs_paper_mse_vs_iter_ihs_diff_m.png}
+            \end{tabular}
+            \caption{Left: classical sketch vs. iterative hessian sketch;
+            Right: different choices of $m=\gamma p$.}
+        \end{center}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Simulations - different sketch matrices}
+    \begin{figure}
+        \begin{center}
+            \begin{tabular}{ll}
+                \includegraphics[scale=0.32]{diff_sketch_mat_err_vs_iter_n500_p10_m60.pdf}
+                &
+                \includegraphics[scale=0.32]{diff_sketch_mat_err_vs_iter_n500_p20_m120.pdf}
+            \end{tabular}
+            \caption{Using different sketch matrices, under Gaussian design. ``expon'' means
+            Laplace design.}
+        \end{center}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Simulations - model mis-specifications}
+
+    \begin{figure}
+        \begin{center}
+            \begin{tabular}{ll}
+                \includegraphics[scale=0.32]{exp_design_err_vs_iter_n500_p20_m120.pdf}
+                &
+                \includegraphics[scale=0.32]{cauchy_design_err_vs_iter_n500_p20_m120.pdf}
+            \end{tabular}
+            \caption{Left: exponential design; Right: Laplace design.}
+        \end{center}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Simulations - model mis-specifications cont.}
+
+    \begin{figure}
+        \begin{center}
+            \begin{tabular}{ll}
+                \includegraphics[scale=0.32]{sin_transform_err_vs_iter_n500_p20_m120.pdf}
+                &
+                \includegraphics[scale=0.32]{cubic_transform_err_vs_iter_n500_p20_m120.pdf}
+            \end{tabular}
+            \caption{Left: $y=\sin(Ax) + w$; Right: $y=(Ax)^3 + w$. Both
+            under Gaussian design. Large noise $w$ behabves similarly.}
+        \end{center}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \begin{center}
+        \Large Thank you!
+    \end{center}
 \end{frame}
 
 \begin{frame}
@@ -171,11 +236,5 @@
     \end{block}
 \end{frame}
 
-
-\begin{frame}
-    \begin{center}
-        \Large Thank you!
-    \end{center}
-\end{frame}
 
 \end{document}
