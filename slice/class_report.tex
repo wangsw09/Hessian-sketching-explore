@@ -1,87 +1,10 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Beamer Presentation
-% LaTeX Template
-% Version 1.0 (10/11/12)
-%
-% This template has been downloaded from:
-% http://www.LaTeXTemplates.com
-%
-% License:
-% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%----------------------------------------------------------------------------------------
-%	PACKAGES AND THEMES
-%----------------------------------------------------------------------------------------
-
 \documentclass{beamer}
 
 \mode<presentation> {
-
-% The Beamer class comes with a number of default slide themes
-% which change the colors and layouts of slides. Below this is a list
-% of all the themes, uncomment each in turn to see what they look like.
-
-%\usetheme{default}
-%\usetheme{AnnArbor}
-%\usetheme{Antibes}
-%\usetheme{Bergen}
-%\usetheme{Berkeley}
-%\usetheme{Berlin}
-%\usetheme{Boadilla}
-%\usetheme{CambridgeUS}
-%\usetheme{Copenhagen}
-%\usetheme{Darmstadt}
-%\usetheme{Dresden}
-%\usetheme{Frankfurt}
-%\usetheme{Goettingen}
-%\usetheme{Hannover}
-%\usetheme{Ilmenau}
-%\usetheme{JuanLesPins}
-%\usetheme{Luebeck}
-\usetheme{Madrid}
-%\usetheme{Malmoe}
-%\usetheme{Marburg}
-%\usetheme{Montpellier}
-%\usetheme{PaloAlto}
-%\usetheme{Pittsburgh}
-%\usetheme{Rochester}
-%\usetheme{Singapore}
-%\usetheme{Szeged}
-%\usetheme{Warsaw}
-
-% As well as themes, the Beamer class has a number of color themes
-% for any slide theme. Uncomment each of these in turn to see how it
-% changes the colors of your current slide theme.
-
-%\usecolortheme{albatross}
-%\usecolortheme{beaver}
-%\usecolortheme{beetle}
-%\usecolortheme{crane}
-%\usecolortheme{dolphin}
-%\usecolortheme{dove}
-%\usecolortheme{fly}
-%\usecolortheme{lily}
-%\usecolortheme{orchid}
-%\usecolortheme{rose}
-%\usecolortheme{seagull}
-%\usecolortheme{seahorse}
-%\usecolortheme{whale}
-%\usecolortheme{wolverine}
-
-%\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
-%\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
-
-%\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
 }
 
-\usepackage{graphicx} % Allows including images
-\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
-
-%----------------------------------------------------------------------------------------
-%	TITLE PAGE
-%----------------------------------------------------------------------------------------
+\usepackage{graphicx}
+\usepackage{booktabs}
 
 \title[Iterative Hessian Sketch]{Iterative Hessian Sketch for Constrained Least-Squares} 
 
@@ -154,73 +77,97 @@
                 x_{hs} := \arg\min_{x\in C} \; \frac{1}{2} \| S Ax\|^2_2 - \langle A^\top y, x \rangle.
             \end{equation*}
         \item<2-> \textbf{Sub-optimal} in the same sense;
-        \item The above serves as the building block for an iterative method
+        \item<3-> With $m \sim O(p)$ sample size, we can obtain a weak result:
+            \begin{equation*}
+                \| x_{hs} - x_{ls} \| \leq \rho \|x_{ls}\|,
+                \quad \text{w.h.p.}
+            \end{equation*}
+            where $\rho \in (0, \frac{1}{2})$.
+        \item<4-> \textit{An iterative idea for improvement}: ``$\| x^{t+1} - x_{ls} \| \leq
+            \rho \|x^{t} - x_{ls}\|$''?
     \end{itemize}
 \end{frame}
 
-%------------------------------------------------
-
 \begin{frame}
-\frametitle{Iterative Hessian Sketch}
-\begin{itemize}
-\item Idea: construct a new least-squares problem for which the optimal solution is $x^{LS} - x^t$. Then applying HS to the problem will produce a new $x^{t+1}$ whose distance to $x^{LS}$ has been reduced by a factor of $\rho$.
-\item $\hat{u} := argmin_{u \in \{C-x^t\}} \{\frac{1}{2} \| Au\|^2_2 - \langle A^T( y-Ax^t), u \rangle \}.$\\
-By construction, $\hat{u} = x^{LS} - x^t$.
-\item Advantages: sample size efficiency and computational time saving
-\end{itemize}
+    \frametitle{Iterative Hessian Sketch}
+
+    A detailed idea:
+    \begin{itemize}
+        \item<1-> Given $x^t$, a modified least square with $x_{ls} -
+            x^t$ as minimizer:
+            \begin{equation*}
+                \only<1>{\min_{u} \frac{1}{2} \| A(u + x^t) \|_2^2 - \langle A^\top y,
+                (u + x^t) \rangle}
+                \only<2->{\min_{u} \frac{1}{2} \| Au \|_2^2 - \langle A^\top (y -
+                Ax^t), u \rangle}
+            \end{equation*}
+        \item<3-> The corresponding Hessian sketch:
+            \begin{equation*}
+                u^{t+1} = \arg\min_{u} \frac{1}{2} \| SAu \|_2^2 - \langle A^\top (y - Ax^t), u \rangle
+            \end{equation*}
+        \item<4-> Property of Hessian sketch: $\|u^{t+1} - (x_{ls} - x^t)\|
+            \leq \rho \|x_{ls} - x^t\|$;
+        \item<5-> Define $x^{t+1} = x^t + u^{t+1}$, then:
+            \begin{equation*}
+                \|x^{t+1} - x_{ls}\| \leq \rho \|x^t - x_{ls}\|,
+                \quad \text{w.h.p.}
+            \end{equation*}
+ 
+    \end{itemize}
 \end{frame}
 
-%------------------------------------------------
-
 \begin{frame}
-\frametitle{Iterative Hessian Sketch Algorithm}
-\begin{block}{Algorithm}
-\begin{enumerate}
-\item Initialize $x^0 = 0$.\\
-\item For iterations $t=0,1,2,...N-1$, generate independent sketches $S^{t+1} \in \mathbb{R}^{mxn}$, and perform the updates \\
-$x^{t+1} = argmin_{x\in C} \{\frac{1}{2m} \| S^{t+1} A (x-x^t)\|^2_2 - \langle A^T(y-Ax^t), x \rangle \}.$ \\
-\item Return $\hat{x} = x^N$.  
-\end{enumerate}
-\end{block}
-
+    \frametitle{Iterative Hessian Sketch}
+    \begin{block}{Algorithm}
+        \begin{enumerate}
+            \item Initialize $x^0 = 0$.\\
+            \item For $t=1,...N$, generate independent sketches $S^t \in
+                \mathbb{R}^{m \times n}$ and
+                \begin{equation*}
+                    x^t = \arg\min_{x \in C} \; \frac{1}{2} \| S^t A(x -
+                    x^{t-1})\|^2_2 - \langle A^T(y-A x^{t-1}), x - x^{t-1} \rangle
+                \end{equation*}
+            \item Return $\hat{x} = x^N$.  
+        \end{enumerate}
+    \end{block}
 \end{frame}
 
-
-%------------------------------------------------
-\section{Simulation Study}
-%------------------------------------------------
-
 \begin{frame}
+    \frametitle{Iterative Hessian Sketch}
+
+    Properties of IHS:
+    \begin{itemize}
+        \item<1-> $m = O(p)$ to guarantee $\|x^t - x_{ls}\| \leq \rho
+            \|x^{t-1} - x_{ls}\|$ in each iteration;
+        \item<2-> To achieve an accuracy of $\epsilon$, we need
+            $\log(\frac{1}{\epsilon})$ iterations;
+        \item<3-> Optimality:
+            \begin{itemize}
+                \item<3-> To achieve the same bound as $\|x_{ls} - x_*\|\approx
+                    O(\frac{1}{\sqrt{n}})$, we need $N=log(n)$ iterations;
+                \item<4-> Union bound: $\|x^N - x_{ls}\| \leq
+                    \rho^N \|x_{ls}\|$, \textit{w.h.p.}.
+            \end{itemize}
+    \end{itemize}
 \end{frame}
 
-%------------------------------------------------
-
 \begin{frame}
-\frametitle{References}
-\footnotesize{
-\begin{thebibliography}{99} 
-\bibitem[Smith, 2012]{p1} Sarlos (2006)
-\newblock Title of the publication
-\newblock \emph{Journal Name} 12(3), 45 -- 678.
-\end{thebibliography}
-}
+    \frametitle{Simulations in the paper}
 \end{frame}
 
-%------------------------------------------------
 \begin{frame}
-\frametitle{Evaluation for Sketch Performance}
-\begin{block}{Cost Approximation}
-In terms of $f$-cost, the approximated $\tilde{x}$ is said to be $\epsilon$-optimal if \\
-\vspace{.5cm}
-$f(x^{LS}) \leq f(\tilde{x}) \leq (1+\epsilon)^2 f(x^{LS})$.
-\end{block}
-
-\begin{block}{Solution Approximation}
-In terms of $f$-cost, the prediction norm defined as \\
-\vspace{.5cm}
-$\|\tilde{x} - x^{LS}\|_A := \frac{1}{\sqrt{n}} \|A(\tilde{x} - x^{LS})\|_2$.
-\end{block}
-
+    \frametitle{Evaluation for Sketch Performance}
+    \begin{block}{Cost Approximation}
+        In terms of $f$-cost, the approximated $\tilde{x}$ is said to be $\epsilon$-optimal if \\
+        \vspace{.5cm}
+        $f(x^{LS}) \leq f(\tilde{x}) \leq (1+\epsilon)^2 f(x^{LS})$.
+    \end{block}
+    
+    \begin{block}{Solution Approximation}
+        In terms of $f$-cost, the prediction norm defined as \\
+        \vspace{.5cm}
+        $\|\tilde{x} - x^{LS}\|_A := \frac{1}{\sqrt{n}} \|A(\tilde{x} - x^{LS})\|_2$.
+    \end{block}
 \end{frame}
 
 
@@ -229,7 +176,5 @@ $\|\tilde{x} - x^{LS}\|_A := \frac{1}{\sqrt{n}} \|A(\tilde{x} - x^{LS})\|_2$.
         \Large Thank you!
     \end{center}
 \end{frame}
-
-%----------------------------------------------------------------------------------------
 
 \end{document}
