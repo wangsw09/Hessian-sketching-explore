@@ -8,6 +8,8 @@ import scipy.linalg as spla
 def sketch_matrix(m, n, type="gaussian"):
     if type == "gaussian":
         return npr.normal(size=(m, n)) / np.sqrt(m)
+    elif type == "exponential":
+        return npr.laplace(scale=sqrt(0.5), size=(m, n)) / np.sqrt(m)
     elif type == "subsample":
         S = np.zeros((m, n))
         S[range(m), npr.choice(n, m, replace=False)] = np.sqrt(n * 1.0 / m)
